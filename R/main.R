@@ -38,7 +38,7 @@ if(RunModel == "y") source("R/model.R")
 
 # 4. Explaining Results
 
-rmarkdown::render("R/README.qmd",
-                  output_file = "README.md",
-                  output_dir = getwd(),
+rmarkdown::render("R/Report.Rmd",
+                  output_file = "Report.html",
+                  output_dir = file.path(getwd(),"Reports"),
                   envir = .GlobalEnv)
