@@ -6,10 +6,7 @@ execute:
   echo: true
   message: false
   warning: false
-always_allow_html: true
-output:
-  md_document:
-    variant: gfm
+output: html_document
 ---
 
 <style>
