@@ -34,10 +34,10 @@ significativo sobre la variable de respuesta para muchos tipos de propiedades.
 Una vez conocido los efectos de las variables sobre los precios era
 necesario diseñar visualizaciones que facilitaran la comunicación los
 resultados con el resto del público y agruparlas en el siguiente dashboard
-también disponible mediante el este [enlace](https://app.powerbi.com/view?r=eyJrIjoiODEyYWFlZjMtYTVjYi00NzY4LTljMmEtOTc5ODg0YzI0MmI0IiwidCI6IjY4NTYxODFmLWRhZjgtNDcyNS1hYzUxLWRkOWY3ZGZlMmYyYiIsImMiOjF9) y en la carpeta `Reports`
+también disponible mediante este [enlace](https://app.powerbi.com/view?r=eyJrIjoiODEyYWFlZjMtYTVjYi00NzY4LTljMmEtOTc5ODg0YzI0MmI0IiwidCI6IjY4NTYxODFmLWRhZjgtNDcyNS1hYzUxLWRkOWY3ZGZlMmYyYiIsImMiOjF9) y en la carpeta `Reports`
 de este repositorio.
 
-El cuadro de mando está dirigido a **personas que están planeando sus vacaciones y le gustaría encontrar un lugar para pasar algunas semanas al menor costo posible**.
+El cuadro de mando está dirigido a **personas que están planeando sus vacaciones y les gustaría encontrar un lugar para pasar algunas semanas al menor costo posible**.
 
 <img src="Reports/dashboard.png" class="center">
 
