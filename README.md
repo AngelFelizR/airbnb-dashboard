@@ -1,13 +1,6 @@
----
-author: Angel Feliz
-date: 2023-02-27
-output:
-  md_document:
-    variant: gfm
-title: Creando Dashboard con data de Airbnb
----
+# Creando Dashboard con data de Airbnb
 
-# 1. Descripcion
+## 1. Descripcion
 
 En este proyecto analizaremos algunos datos sobre las propiedades que
 las empresa **Airbnb** tiene disponible en la República Dominicana.
@@ -18,12 +11,7 @@ Para reproducir el proyecto solo se necesita clonar el repositorio y
 ejecutar `R/main.R` usando como motor [Microsoft R Open
 4.0.2](https://mran.microsoft.com/open)
 
-# 2. Dashboard final
-
-<iframe title="Airbnb-dashboard" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiODEyYWFlZjMtYTVjYi00NzY4LTljMmEtOTc5ODg0YzI0MmI0IiwidCI6IjY4NTYxODFmLWRhZjgtNDcyNS1hYzUxLWRkOWY3ZGZlMmYyYiIsImMiOjF9" frameborder="0" allowFullScreen="true">
-</iframe>
-
-# 3. Proceso de elaboración
+## 2. Proceso de investigación
 
 Para poder indentificar los patrones que siguien los precios de las
 diferentes propiedades de la empresa y de esta manera usar estos
@@ -38,13 +26,17 @@ algunos casos también el mes puede efectar el precio de las mismas.
 
 <img src="Reports/model-summary.png" class="center">
 
-# 4. Comunición de los resultados
+
+## 3. Presentación de resultados
 
 Una vez conocido los efectos de las variables sobre los precios era
 necesario diseñar visualizaciones que facilitaran la comunición los
-resultados con el resto del público.
+resultados con el resto del público y agruparlas en el siguiente dashboard
+también disponible mediante el este [enlace](https://app.powerbi.com/view?r=eyJrIjoiODEyYWFlZjMtYTVjYi00NzY4LTljMmEtOTc5ODg0YzI0MmI0IiwidCI6IjY4NTYxODFmLWRhZjgtNDcyNS1hYzUxLWRkOWY3ZGZlMmYyYiIsImMiOjF9)
 
-## 4.1. Precio por cada tipo de propiedad y año
+<img src="Reports/dashboard.png" class="center">
+
+### 3.1. Precio por cada tipo de propiedad y año
 
 ``` r
 dataset <- AirbnbPrecios
@@ -121,7 +113,7 @@ ggplot(PreciosYear,
 
 ![](README_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
 
-## 4.2. Precio de las propiedades por provincia
+### 3.2. Precio de las propiedades por provincia
 
 ``` r
 dataset <- AirbnbPrecios
@@ -180,7 +172,7 @@ ggplot(PreciosProvincia,
 
 ![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
-## 4.3. Precio de las propiedades por mes
+### 3.3. Precio de las propiedades por mes
 
 ``` r
 dataset <- AirbnbPrecios
@@ -266,7 +258,7 @@ ggplot(PreciosMonth,
 
 ![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
-## 4.4. Habitaciones disponibles por provincia
+### 3.4. Habitaciones disponibles por provincia
 
 ``` r
 dataset <- HabitacionesActivas
