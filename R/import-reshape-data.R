@@ -7,10 +7,10 @@ AirbnbData <-
              skip = 2,
              col_names = ColNames) %>%
   as.data.table() %>%
-  (\(DT) DT[, `:=`(fecha = as_date(fecha),
-                   year = year(fecha),
-                   month = factor(month.abb[month(fecha)],
-                                  levels = month.abb))])()
+  .[, `:=`(fecha = as_date(fecha),
+           year = year(fecha),
+           month = factor(month.abb[month(fecha)],
+                          levels = month.abb))]
 
 
 # 2. Data reshaping ----
@@ -33,18 +33,15 @@ AirbnbPrecios <-
 HabitacionesActivas <-
   melt(AirbnbData, 
        id.vars = c("year","month","provincia"),
-       measure.vars = patterns(propiedades_activas = "^propiedades_activas_\\d"),
+       measure.vars = patterns("^propiedades_activas_\\d"),
        variable.name = "n_habitaciones",
+       value.name = "propiedades_activas",
        na.rm = TRUE
   )[, .(propiedades_activas = median(propiedades_activas)),
     by = .(provincia,
            n_habitaciones = as.integer(n_habitaciones))
   ][, color_level := 
-      fcase(propiedades_activas >= quantile(propiedades_activas, 0.75),
-            "4",
-            propiedades_activas >= quantile(propiedades_activas, 0.5),
-            "3",
-            propiedades_activas >= quantile(propiedades_activas, 0.25),
-            "2",
-            default = "1")]
-
+      dplyr::case_when(propiedades_activas >= quantile(propiedades_activas, 0.75)~"4",
+                       propiedades_activas >= quantile(propiedades_activas, 0.5) ~"3",
+            propiedades_activas >= quantile(propiedades_activas, 0.25)~"2",
+            TRUE~"1")]

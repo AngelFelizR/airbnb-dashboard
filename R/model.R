@@ -15,27 +15,16 @@ ModelResults <-
       upper = quantile(estimate, 0.975)),
     by = c("tipo","term")
   ][, significativo := 
-      fcase(0 >= lower & 0 <= upper,
-            "No effect",
-            0 < lower,
-            "Positive effect",
-            0 > upper,
-            "Negative effect") %>%
+      dplyr::case_when(0 >= lower & 0 <= upper ~ "No effect",
+                       0 < lower ~ "Positive effect",
+                       0 > upper ~ "Negative effect",
+                       TRUE~NA_character_) %>%
       factor(levels = c("No effect", 
                         "Negative effect",
                         "Positive effect"))]
 
 
 # Saving results ----
-
-PropierdadesMonthEffect <-
-  ModelResults[term %like% "month" & 
-                 significativo != "No effect",
-               unique(.SD),
-               .SDcols = "tipo"]
-
-
-fwrite(PropierdadesMonthEffect, "model-output/propiedades-monthly-efect.csv")
 
 ModelSummaryPlot <-
   ggplot(ModelResults,
@@ -51,6 +40,6 @@ ModelSummaryPlot <-
   theme(axis.line = element_blank(),
         plot.title = element_text(hjust = 0.5))
 
-ggsave("model-output/model-summary.png",
+ggsave("Reports/model-summary.png",
        plot = ModelSummaryPlot,
        width = 13, height = 6)

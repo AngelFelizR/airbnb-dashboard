@@ -1,8 +1,10 @@
 ---
-title: "Creating dashboard with Airbnb prices"
+title: "Creando Dashboard con data de Airbnb"
 author: "Angel Feliz"
 date: "2023-02-27"
-output: html_document
+output:
+  md_document:
+    variant: gfm
 ---
 
 ```{r setup, include=FALSE}
@@ -11,34 +13,56 @@ knitr::opts_chunk$set(echo = TRUE,
                       message = FALSE)
 ```
 
-<style>
 
-code{color: #0c5bd1;}
+# 1. Descripcion
 
-.center {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 50%;
-}
+En este proyecto analizaremos algunos datos sobre las propiedades que las empresa **Airbnb** tiene disponible en la República Dominicana.
 
-</style>
+<img src="Reports/airbnb-logo.png" class="center">
 
-# 1. Introduction
-
-Airbnb es una empresa 
-
-<img src="airbnb-logo.png" class="center">
+Para reproducir el proyecto solo se necesita clonar el repositorio y ejecutar `R/main.R` usando como motor [Microsoft R Open 4.0.2](https://mran.microsoft.com/open)
 
 
-# 2. Analysis results
+# 2. Dashboard final
 
-## 2.1. La rentas estan aumentando cada año
+<iframe title="Airbnb-dashboard" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiODEyYWFlZjMtYTVjYi00NzY4LTljMmEtOTc5ODg0YzI0MmI0IiwidCI6IjY4NTYxODFmLWRhZjgtNDcyNS1hYzUxLWRkOWY3ZGZlMmYyYiIsImMiOjF9" frameborder="0" allowFullScreen="true"></iframe>
+
+
+# 3. Proceso de elaboración
+
+Para poder indentificar los patrones que siguien los precios de las diferentes propiedades de la empresa y de esta manera usar estos resultados para luego cominicarlos mediante el dashboard hemos utilizado la técnica te bootstraping para calcular 1,000 regresiones lineales como cada tipo de propiedad, evitando los problemas desencadenados por la falta de normalidad en los datos.
+
+Como se puede ver a continuación el años tienen un efecto positivo sobre el precio de las propiedades, así como la provincia de la propiedad y en algunos casos también el mes puede efectar el precio de las mismas.
+
+<img src="Reports/model-summary.png" class="center">
+
+
+# 4. Comunición de los resultados
+
+Una vez conocido los efectos de las variables sobre los precios era necesario diseñar visualizaciones que facilitaran la comunición los resultados con el resto del público.
+
+
+## 4.1. Precio por cada tipo de propiedad y año
 
 ```{r}
+dataset <- AirbnbPrecios
+
+RedColor <- "#d52121"
+GreenColor <- "#4DC966"
+GreyColor <- "#AAAAAA"
+
+library(data.table)
+library(ggplot2)
+library(scales)
+library(ggtext)
+glue <- glue::glue
+`%>%` <- magrittr::`%>%`
+
+setDT(dataset)
+
 PreciosYear <-
-  AirbnbPrecios[, .(median_precio = median(precio, na.rm = TRUE)),
-                by = c("tipo","year")]
+  dataset[, .(median_precio = median(precio, na.rm = TRUE)),
+          by = c("tipo","year")]
 
 
 PreciosYearCoef <-
@@ -46,9 +70,11 @@ PreciosYearCoef <-
   lm(formula = median_precio ~ year) %>%
   coef() 
 
+
 PreciosYearColor <-
   fifelse(PreciosYearCoef[2] < 0,
           GreenColor, RedColor)
+
 
 PreciosYearSentido <-
   fifelse(PreciosYearCoef[2] < 0,
@@ -56,22 +82,19 @@ PreciosYearSentido <-
 
 
 PreciosYearTitle <-
-  glue("Los precios <span style='color:{PreciosYearColor};font-weight:bold'>{PreciosYearSentido}</span>",
+  glue("Los precios <span style='color:{PreciosYearColor}'>**{PreciosYearSentido}**</span>",
        " en promedio ",
-       "<span style='color:{PreciosYearColor};font-weight:bold'>",
+       "<span style='color:{PreciosYearColor}'>**",
        PreciosYearCoef[2] %>% abs() %>% dollar(accuracy = 1),
-       "</span> cada año",
-       "<br><sup>Precio por cada tipo de propiedad y año</sup>")
+       "**</span> cada año")
 
 
-PreciosYearPlot <-
-  ggplot(PreciosYear,
-         aes(year, median_precio))+
+ggplot(PreciosYear,
+       aes(year, median_precio))+
+  geom_blank(aes(x = year +0.65))+
   geom_line(aes(group = tipo),
             color = GreyColor)+
-  geom_point(aes(text = paste0(tipo,": ",
-                              dollar(median_precio, accuracy = 1))),
-             color = GreyColor, size = 0.75)+
+  geom_point(color = GreyColor, size = 0.75)+
   geom_smooth(method = "lm", 
               se = FALSE,
               lwd = 1,
@@ -79,92 +102,109 @@ PreciosYearPlot <-
                               RedColor,
                               GreenColor) )+
   geom_text(aes(label = tipo,
-                x = year +0.25), 
+                x = year +0.45), 
             color = GreyColor,
+            check_overlap = TRUE,
             size = 3.5,
             data = PreciosYear[year == max(year)])+
   scale_y_log10(breaks = breaks_log(7),
                 labels = dollar_format(accuracy = 1))+
-  expand_limits(x = max(PreciosYear$year)+1)
+  labs(title = PreciosYearTitle,
+       subtitle = "Precio por cada tipo de propiedad y año",
+       x = "Año",
+       y = "Precio de las propiedades")+
+  theme_classic()+
+  theme(plot.title = element_markdown(size = 14))
 
-
-ggplotly(PreciosYearPlot, tooltip = "text") %>%
-  layout(title = list(text = PreciosYearTitle,
-                      xref="paper",
-                      x=0,
-                      font = list(size = 16)),
-         xaxis = list(title = list(text = "Año",
-                                   font = list(size = 14))),
-         yaxis = list(title = list(text = "Precio de las propiedades",
-                                   font = list(size = 14))))
-  
 ```
 
 
-## 2.2. Los precios cambian de provincia en provincia
+## 4.2. Precio de las propiedades por provincia
 
 ```{r}
 
+dataset <- AirbnbPrecios
+
+RedColor <- "#d52121"
+GreenColor <- "#4DC966"
+GreyColor <- "#AAAAAA"
+
+library(data.table)
+library(ggplot2)
+library(scales)
+library(forcats)
+library(ggtext)
+
+glue <- glue::glue
+`%>%` <- magrittr::`%>%`
+
+setDT(dataset)
+
 PreciosProvincia <-
-  AirbnbPrecios[, .(median_precio = median(precio, na.rm = TRUE),
-                    tipos_no_disponibles = 
-                      unique(AirbnbPrecios$tipo) %>% 
-                      sort() %>% 
-                      setdiff(tipo[precio>0]) %>%
-                      paste0(collapse = ", ")),
-                by = "provincia"
+  dataset[, .(median_precio = median(precio, na.rm = TRUE)),
+          by = "provincia"
   ][median_precio > 0
   ][,`:=`(provincia = fct_reorder(provincia, median_precio, sum, .desc = TRUE),
           higher_value = median_precio == max(median_precio))]
 
 
-PreciosProvinciaPlot <-
-  ggplot(PreciosProvincia,
-         aes(median_precio, fct_rev(provincia)))+
-  geom_col(aes(fill = higher_value,
-               text = 
-                 fifelse(tipos_no_disponibles %like% "\\w",
-                         paste0("<br>Propiedades ausentes: ", 
-                                tipos_no_disponibles),
-                         "") %>%
-                 paste0("Mediana: ", dollar(median_precio, accuracy = 1),
-                        next_line = .)))+
-  scale_fill_manual(values = c("TRUE" = RedColor,
-                               "FALSE" = GreyColor))+
-  scale_x_continuous(breaks = breaks_width(200),
-                     labels = dollar_format(accuracy = 1))+
-  theme(legend.position = "none")
-
-
 PreciosProvinciaTitle <-
-  glue("<span style='color:{RedColor};font-weight:bold'>",
+  glue("<span style='color:{RedColor}'>**",
        PreciosProvincia[higher_value == TRUE, 
                         as.character(provincia)],
-       "</span> tiene los precios más elevados",
-       "<br><sup>Precio de las propiedades por provincia</sup>")
+       "**</span> tiene los precios más elevados")
 
 
-ggplotly(PreciosProvinciaPlot, tooltip = "text") %>%
-  layout(title = list(text = PreciosProvinciaTitle,
-                      xref="paper",
-                      x=0,
-                      font = list(size = 16)),
-         xaxis = list(title = list(text = "Precio de las propiedades",
-                                   font = list(size = 14))),
-         yaxis = list(title = list(text = "Provincias",
-                                   font = list(size = 14))))
+ggplot(PreciosProvincia,
+       aes(median_precio, fct_rev(provincia),
+           fill = higher_value,
+           color = higher_value))+
+  geom_blank(aes(x = median_precio*1.15))+
+  geom_col(width = 0.8)+
+  geom_text(aes(label = dollar(median_precio, accuracy = 1)),
+            hjust = -0.155)+
+  scale_fill_manual(values = c("TRUE" = RedColor,
+                               "FALSE" = GreyColor))+
+  scale_color_manual(values = c("TRUE" = RedColor,
+                                "FALSE" = GreyColor))+
+  scale_x_continuous(labels = dollar_format(accuracy = 1))+
+  labs(title = PreciosProvinciaTitle,
+       subtitle = "Precio de las propiedades por provincia",
+       x = "Precio de las propiedades",
+       y = "Provincias")+
+  theme_classic()+
+  theme(legend.position = "none",
+        plot.title = element_markdown(size = 14))
+
 ```
 
 
-## 2.3. Algunos precios cambian en ciertos meses y provincias
+## 4.3. Precio de las propiedades por mes
 
 ```{r}
 
+dataset <- AirbnbPrecios
+
+RedColor <- "#d52121"
+GreenColor <- "#4DC966"
+GreyColor <- "#AAAAAA"
+
+library(data.table)
+library(ggplot2)
+library(scales)
+library(forcats)
+library(ggtext)
+
+glue <- glue::glue
+`%>%` <- magrittr::`%>%`
+
+setDT(dataset)
+dataset[, month := factor(month, levels = month.abb)]
+
+
 PreciosMonth <-
-  AirbnbPrecios[tipo == fread(here("model-output/propiedades-monthly-efect.csv"))[[1]][6] &
-                  provincia == "Valverde",
-                .(mediana_precio = median(precio)),
-                by = "month"
+  dataset[,.(mediana_precio = median(precio)),
+          by = "month"
   ][,`:=`(max_month = mediana_precio == max(mediana_precio) |
             mediana_precio / max(mediana_precio) >= 0.95,
           min_month = mediana_precio == min(mediana_precio) |
@@ -187,9 +227,10 @@ MonthColor <-
 PreciosMonthTitle <-
   PreciosMonth[result_month == TRUE, 
                month.name[as.integer(month)]] %>%
-  paste0(glue("<span style='color:{MonthColor};font-weight:bold'>"),
-         month = ., "</span>") %>%
-  (\(x) if(length(x) == 1){
+  paste0(glue("<span style='color:{MonthColor}'>**"),
+         . ,
+         "**</span>") %>%
+  (function(x) if(length(x) == 1){
         paste0(x, " es el mes ")
         }else{
           paste0(x[-length(x)], collapse = ", ") %>%
@@ -197,79 +238,81 @@ PreciosMonthTitle <-
         })() %>%
   paste0(fifelse(MonthColor == RedColor, 
                  "con mayor precio",
-                 "con menor precio"),
-         "<br><sup>Precio de las propiedades por mes</sup>")
+                 "con menor precio"))
 
 
-PreciosMonthPlot <-
-  PreciosMonth %>%
-  ggplot(aes(mediana_precio,
-             fct_rev(month), 
-             color = result_month))+
-  geom_point(aes(text = dollar(mediana_precio, accuracy = 1)),
-             size = 4)+
+ggplot(PreciosMonth,
+       aes(mediana_precio,
+           fct_rev(month), 
+           color = result_month))+
+  geom_blank(aes(x = mediana_precio * 1.1))+
+  geom_point(size = 4)+
   geom_segment(aes(yend = month, xend = mediana_precio),
                x = 0,
-               linewidth = 1.5)+
+               lwd = 1.5)+
+  geom_text(aes(label = dollar(mediana_precio, accuracy = 1)),
+            hjust = -0.40)+
   scale_x_continuous(labels = dollar_format(accuracy = 1))+
   scale_color_manual(values = c("FALSE" = GreyColor,
                                 "TRUE" =  MonthColor))+
-  theme(legend.position = "none")
-
-
-ggplotly(PreciosMonthPlot, tooltip = "text") %>%
-  layout(title = list(text = PreciosMonthTitle,
-                      xref="paper",
-                      x=0,
-                      font = list(size = 16)),
-         xaxis = list(title = list(text = "Precio de las propiedades",
-                                   font = list(size = 14))),
-         yaxis = list(title = list(text = "Meses",
-                                   font = list(size = 14))))
+  labs(title = PreciosMonthTitle,
+       subtitle = "Precio de las propiedades por mes",
+       x = "Precio de las propiedades",
+       y = "Meses")+
+  theme_classic()+
+  theme(legend.position = "none",
+        plot.title = element_markdown())
   
 ```
 
 
-## 2.4. Las habitaciones disponibles son diferentes en cada provincia
+## 4.4. Habitaciones disponibles por provincia
 
 ```{r}
 
+dataset <- HabitacionesActivas
+
+library(data.table)
+library(ggplot2)
+library(scales)
+library(ggtext)
+
+glue <- glue::glue
+`%>%` <- magrittr::`%>%`
+
+setDT(dataset)
+dataset[, color_level := as.character(color_level)]
+
 HabitacionesActivasTitle <-
-  HabitacionesActivas[, .(total_level = sum(color_level == "4")),
-                      by = "provincia"
+  dataset[, .(total_level = sum(as.integer(color_level))),
+          by = "provincia"
   ][total_level == max(total_level), provincia] %>%
-  paste0("<b>", provincia = ., "</b>") %>%
-  (\(x) if(length(x) == 1){
-    paste0(x, " es la provincia ")
+  paste0("<span style='color:#d52121'>**", provincia = ., "**</span>") %>%
+  (function(x) if(length(x) == 1){
+    paste0(x, " provincia ")
   }else{
     paste0(x[-length(x)], collapse = ", ") %>%
       paste0(" y ", tail(x,1)," son las provincias ")
   })() %>%
-  paste0("con la mayor disponibilidad de habitaciones",
-         "<br><sup>Habitaciones disponibles por provincia</sup>")
+  paste0("con la mayor disponibilidad")
 
-HabitacionesActivasPlot <-
-  ggplot(HabitacionesActivas,
-         aes(n_habitaciones, provincia))+
+
+ggplot(dataset,
+       aes(n_habitaciones, provincia))+
   geom_tile(aes(fill = color_level),
             color = "white")+
   geom_text(aes(label = comma(propiedades_activas, accuracy = 1),
                 color = color_level))+
   scale_fill_manual(values = c("white","#c6c6c6","#c88983","#bc4646") )+
-  scale_color_manual(values = c(GreyColor,"grey50", "white", "white") )+
+  scale_color_manual(values = c("#AAAAAA","grey50", "white", "white") )+
+  labs(title = HabitacionesActivasTitle,
+       subtitle = "Habitaciones disponibles por provincia",
+       x = "Número de habitaciones",
+       y = "Provincias") +
+  theme_classic()+
   theme(legend.position = "none",
-        axis.line = element_blank())
-
-
-ggplotly(HabitacionesActivasPlot, tooltip = "text") %>%
-  layout(title = list(text = HabitacionesActivasTitle,
-                      xref="paper",
-                      x=0,
-                      font = list(size = 16)),
-         xaxis = list(title = list(text = "Número de habitaciones",
-                                   font = list(size = 14))),
-         yaxis = list(title = list(text = "Provincia",
-                                   font = list(size = 14))))
+        axis.line = element_blank(),
+        plot.title = element_markdown(size = 13.3))
 
 ```
 
