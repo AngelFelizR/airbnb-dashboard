@@ -119,7 +119,7 @@ ggplot(PreciosYear,
   theme(plot.title = element_markdown(size = 14))
 ```
 
-![](C:\Users\angel\R-folder\PROYEC~1\PORTFO~1\AIRBNB~1\README~1/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
 
 ## 4.2. Precio de las propiedades por provincia
 
@@ -178,7 +178,7 @@ ggplot(PreciosProvincia,
         plot.title = element_markdown(size = 14))
 ```
 
-![](C:\Users\angel\R-folder\PROYEC~1\PORTFO~1\AIRBNB~1\README~1/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 ## 4.3. Precio de las propiedades por mes
 
@@ -264,7 +264,7 @@ ggplot(PreciosMonth,
         plot.title = element_markdown())
 ```
 
-![](C:\Users\angel\R-folder\PROYEC~1\PORTFO~1\AIRBNB~1\README~1/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
 ## 4.4. Habitaciones disponibles por provincia
 
@@ -314,4 +314,4 @@ ggplot(dataset,
         plot.title = element_markdown(size = 13.3))
 ```
 
-![](C:\Users\angel\R-folder\PROYEC~1\PORTFO~1\AIRBNB~1\README~1/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
