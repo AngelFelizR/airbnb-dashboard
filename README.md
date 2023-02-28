@@ -1,28 +1,30 @@
 # Creando Dashboard con data de Airbnb
 
-## 1. Descripcion
+## 1. Descripción
 
 En este proyecto analizaremos algunos datos sobre las propiedades que
-las empresa **Airbnb** tiene disponible en la República Dominicana.
+la empresa **Airbnb** tiene disponible en la República Dominicana.
 
 <img src="Reports/airbnb-logo.png" class="center">
 
 Para reproducir el proyecto solo se necesita clonar el repositorio y
 ejecutar `R/main.R` usando como motor [Microsoft R Open
-4.0.2](https://mran.microsoft.com/open)
+4.0.2](https://mran.microsoft.com/open) y los maquetes listados en `renv.lock`
+dentro de este repositorio.
 
 ## 2. Proceso de investigación
 
-Para poder indentificar los patrones que siguien los precios de las
-diferentes propiedades de la empresa y de esta manera usar estos
-resultados para luego cominicarlos mediante el dashboard hemos utilizado
-la técnica te bootstraping para calcular 1,000 regresiones lineales como
-cada tipo de propiedad, evitando los problemas desencadenados por la
-falta de normalidad en los datos.
+Para poder identificar los patrones que siguen los precios de las
+diferentes propiedades dentro del conjunto de datos suministrados hemos 
+utilizado la técnica de **re-sampleo bootstraping** para calcular 1,000 regresiones 
+lineales por cada tipo de propiedad y evitar así los problemas desencadenados 
+por no cumplir los supuestos de normalidad. Los resultados obtenidos 
+mediante este procedimiento son los que a su vez serán comunicados de manera 
+sencilla en el dashboard.
 
-Como se puede ver a continuación el años tienen un efecto positivo sobre
-el precio de las propiedades, así como la provincia de la propiedad y en
-algunos casos también el mes puede efectar el precio de las mismas.
+Como se puede ver a continuación, el año y el mes en que se hace la publicación
+así como la provincia donde está ubicada la propiedad tienen un efecto
+significativo sobre la variable de respuesta para muchos tipos de propiedades.
 
 <img src="Reports/model-summary.png" class="center">
 
@@ -30,9 +32,11 @@ algunos casos también el mes puede efectar el precio de las mismas.
 ## 3. Presentación de resultados
 
 Una vez conocido los efectos de las variables sobre los precios era
-necesario diseñar visualizaciones que facilitaran la comunición los
+necesario diseñar visualizaciones que facilitaran la comunicación los
 resultados con el resto del público y agruparlas en el siguiente dashboard
-también disponible mediante el este [enlace](https://app.powerbi.com/view?r=eyJrIjoiODEyYWFlZjMtYTVjYi00NzY4LTljMmEtOTc5ODg0YzI0MmI0IiwidCI6IjY4NTYxODFmLWRhZjgtNDcyNS1hYzUxLWRkOWY3ZGZlMmYyYiIsImMiOjF9)
+también disponible mediante el este [enlace](https://app.powerbi.com/view?r=eyJrIjoiODEyYWFlZjMtYTVjYi00NzY4LTljMmEtOTc5ODg0YzI0MmI0IiwidCI6IjY4NTYxODFmLWRhZjgtNDcyNS1hYzUxLWRkOWY3ZGZlMmYyYiIsImMiOjF9).
+
+El cuadro de mando está dirigido a **personas que están planeando sus vacaciones y le gustaría encontrar un lugar para pasar algunas semanas al menor costo posible**.
 
 <img src="Reports/dashboard.png" class="center">
 
